@@ -1,0 +1,220 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" version="1.2">
+  <file source-language="en-US" target-language="pl-PL" datatype="plaintext" original="ModulesQuinceeventsAdmin">
+    <body>
+
+      <!-- Moduł -->
+      <trans-unit id="quince.events.name">
+        <source>Quince Events</source>
+        <target>Quince Events</target>
+      </trans-unit>
+      <trans-unit id="quince.events.desc">
+        <source>Shop event log and outgoing delivery to external systems (CEP, n8n, Windmill or anything else listening).</source>
+        <target>Dziennik zdarzeń sklepu i ich wysyłka do systemów zewnętrznych (CEP, n8n, Windmill albo cokolwiek innego, co nasłuchuje).</target>
+      </trans-unit>
+
+      <!-- Komunikaty -->
+      <trans-unit id="quince.events.flash.not_found">
+        <source>That event does not exist.</source>
+        <target>To zdarzenie nie istnieje.</target>
+      </trans-unit>
+      <trans-unit id="quince.events.flash.invalid_token">
+        <source>Invalid security token, please try again.</source>
+        <target>Nieprawidłowy token bezpieczeństwa, spróbuj ponownie.</target>
+      </trans-unit>
+      <trans-unit id="quince.events.flash.accepted">
+        <source>The receiving flow accepted the event.</source>
+        <target>Przepływ po drugiej stronie przyjął zdarzenie.</target>
+      </trans-unit>
+      <trans-unit id="quince.events.flash.not_accepted">
+        <source>The event was not accepted. It stays in the queue, the reason is below.</source>
+        <target>Zdarzenie nie zostało przyjęte. Zostaje w kolejce, powód jest poniżej.</target>
+      </trans-unit>
+      <trans-unit id="quince.events.flash.saved">
+        <source>Settings saved.</source>
+        <target>Ustawienia zapisane.</target>
+      </trans-unit>
+      <trans-unit id="quince.events.flash.new_secret">
+        <source>New secret: %secret%. Copy it into the receiving flow now, it will not be shown again.</source>
+        <target>Nowy sekret: %secret%. Skopiuj go teraz do przepływu po drugiej stronie, nie pokaże się ponownie.</target>
+      </trans-unit>
+      <trans-unit id="quince.events.flash.fill_first">
+        <source>Fill in the address and the secret first.</source>
+        <target>Najpierw wpisz adres i sekret.</target>
+      </trans-unit>
+      <trans-unit id="quince.events.flash.test_accepted">
+        <source>The receiving flow accepted the test event.</source>
+        <target>Przepływ po drugiej stronie przyjął próbne zdarzenie.</target>
+      </trans-unit>
+      <trans-unit id="quince.events.flash.test_not_accepted">
+        <source>The test event was not accepted. It waits in the queue, the reason is in the events list.</source>
+        <target>Próbne zdarzenie nie zostało przyjęte. Czeka w kolejce, powód jest na liście zdarzeń.</target>
+      </trans-unit>
+
+      <!-- Stany -->
+      <trans-unit id="quince.events.status.pending">
+        <source>Waiting</source>
+        <target>Oczekuje</target>
+      </trans-unit>
+      <trans-unit id="quince.events.status.sent">
+        <source>Delivered</source>
+        <target>Dostarczone</target>
+      </trans-unit>
+      <trans-unit id="quince.events.status.failed">
+        <source>Failed</source>
+        <target>Nieudane</target>
+      </trans-unit>
+
+      <!-- Szczegóły zdarzenia -->
+      <trans-unit id="quince.events.events">
+        <source>Events</source>
+        <target>Zdarzenia</target>
+      </trans-unit>
+      <trans-unit id="quince.events.payload">
+        <source>Event payload</source>
+        <target>Treść zdarzenia</target>
+      </trans-unit>
+      <trans-unit id="quince.events.last_error">
+        <source>Last error</source>
+        <target>Ostatni błąd</target>
+      </trans-unit>
+      <trans-unit id="quince.events.information">
+        <source>Information</source>
+        <target>Informacje</target>
+      </trans-unit>
+      <trans-unit id="quince.events.event_id">
+        <source>Event ID</source>
+        <target>ID zdarzenia</target>
+      </trans-unit>
+      <trans-unit id="quince.events.submitted">
+        <source>Submitted</source>
+        <target>Utworzone</target>
+      </trans-unit>
+      <trans-unit id="quince.events.attempts">
+        <source>Attempts</source>
+        <target>Próby</target>
+      </trans-unit>
+      <trans-unit id="quince.events.next_attempt">
+        <source>Next attempt</source>
+        <target>Następna próba</target>
+      </trans-unit>
+      <trans-unit id="quince.events.retry_now">
+        <source>Retry now</source>
+        <target>Ponów teraz</target>
+      </trans-unit>
+
+      <!-- Lista zdarzeń -->
+      <trans-unit id="quince.events.list.intro">
+        <source>Everything the shop has sent to the outside world, and everything still waiting to go.</source>
+        <target>Wszystko, co sklep wysłał na zewnątrz, i wszystko, co jeszcze czeka na wysyłkę.</target>
+      </trans-unit>
+      <trans-unit id="quince.events.list.waiting">
+        <source>Waiting to send</source>
+        <target>Czeka na wysyłkę</target>
+      </trans-unit>
+      <trans-unit id="quince.events.list.event_type">
+        <source>Event type</source>
+        <target>Rodzaj zdarzenia</target>
+      </trans-unit>
+      <trans-unit id="quince.events.list.all">
+        <source>All</source>
+        <target>Wszystkie</target>
+      </trans-unit>
+      <trans-unit id="quince.events.list.status">
+        <source>Status</source>
+        <target>Status</target>
+      </trans-unit>
+      <trans-unit id="quince.events.list.from">
+        <source>From</source>
+        <target>Od</target>
+      </trans-unit>
+      <trans-unit id="quince.events.list.to">
+        <source>To</source>
+        <target>Do</target>
+      </trans-unit>
+      <trans-unit id="quince.events.list.filter">
+        <source>Filter</source>
+        <target>Filtruj</target>
+      </trans-unit>
+      <trans-unit id="quince.events.list.clear">
+        <source>Clear</source>
+        <target>Wyczyść</target>
+      </trans-unit>
+      <trans-unit id="quince.events.list.type">
+        <source>Type</source>
+        <target>Rodzaj</target>
+      </trans-unit>
+      <trans-unit id="quince.events.list.details">
+        <source>Details</source>
+        <target>Szczegóły</target>
+      </trans-unit>
+      <trans-unit id="quince.events.list.retry">
+        <source>Retry</source>
+        <target>Ponów</target>
+      </trans-unit>
+      <trans-unit id="quince.events.list.pagination">
+        <source>Page %page% of %pages%, %total% entries</source>
+        <target>Strona %page% z %pages%, wpisy: %total%</target>
+      </trans-unit>
+      <trans-unit id="quince.events.list.empty">
+        <source>Nothing matches these filters.</source>
+        <target>Nic nie pasuje do tych filtrów.</target>
+      </trans-unit>
+
+      <!-- Ustawienia -->
+      <trans-unit id="quince.events.save">
+        <source>Save changes</source>
+        <target>Zapisz zmiany</target>
+      </trans-unit>
+      <trans-unit id="quince.events.settings.title">
+        <source>Where the shop sends what happens</source>
+        <target>Dokąd sklep wysyła to, co się dzieje</target>
+      </trans-unit>
+      <trans-unit id="quince.events.settings.desc">
+        <source>Every event goes to this address as soon as it happens. On the other side you can put a flow in n8n or Windmill.</source>
+        <target>Każde zdarzenie idzie pod ten adres od razu, gdy się wydarzy. Po drugiej stronie możesz postawić przepływ w n8n albo Windmill.</target>
+      </trans-unit>
+      <trans-unit id="quince.events.settings.enabled">
+        <source>Send events</source>
+        <target>Wysyłaj zdarzenia</target>
+      </trans-unit>
+      <trans-unit id="quince.events.settings.address">
+        <source>Address</source>
+        <target>Adres</target>
+      </trans-unit>
+      <trans-unit id="quince.events.settings.address_hint">
+        <source>The webhook address given to you by n8n, Windmill or whatever waits on the other side.</source>
+        <target>Adres webhooka, który podał ci n8n, Windmill albo cokolwiek czeka po drugiej stronie.</target>
+      </trans-unit>
+      <trans-unit id="quince.events.settings.secret">
+        <source>Shared secret</source>
+        <target>Wspólny sekret</target>
+      </trans-unit>
+      <trans-unit id="quince.events.settings.secret_none">
+        <source>Not set yet</source>
+        <target>Jeszcze nie ustawiony</target>
+      </trans-unit>
+      <trans-unit id="quince.events.settings.secret_generate">
+        <source>Generate a new secret</source>
+        <target>Wygeneruj nowy sekret</target>
+      </trans-unit>
+      <trans-unit id="quince.events.settings.secret_hint">
+        <source>The shop signs every message with it and the receiving side checks the signature.</source>
+        <target>Sklep podpisuje nim każdą wiadomość, a strona odbierająca sprawdza podpis.</target>
+      </trans-unit>
+      <trans-unit id="quince.events.settings.test_title">
+        <source>Check the connection</source>
+        <target>Sprawdź połączenie</target>
+      </trans-unit>
+      <trans-unit id="quince.events.settings.test_desc">
+        <source>Sends one test message and tells you what came back.</source>
+        <target>Wysyła jedną próbną wiadomość i pokazuje, co wróciło.</target>
+      </trans-unit>
+      <trans-unit id="quince.events.settings.test_send">
+        <source>Send a test event</source>
+        <target>Wyślij próbne zdarzenie</target>
+      </trans-unit>
+
+    </body>
+  </file>
+</xliff>

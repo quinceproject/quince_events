@@ -64,7 +64,7 @@ class SettingsController extends EventsController
         $sekret = $this->dispatcher->generateSecret();
 
         $this->addFlash('success', $this->trans(
-            'New secret: %secret% — copy it into the receiving flow now, it will not be shown again.',
+            'New secret: %secret%. Copy it into the receiving flow now, it will not be shown again.',
             self::DOMAIN,
             ['%secret%' => $sekret]
         ));
@@ -91,7 +91,7 @@ class SettingsController extends EventsController
             $this->addFlash('success', $this->trans('The receiving flow accepted the test event.', self::DOMAIN));
         } else {
             $this->addFlash('error', $this->trans(
-                'The test event was not accepted. It waits in the queue — the reason is in the events list.',
+                'The test event was not accepted. It waits in the queue, the reason is in the events list.',
                 self::DOMAIN
             ));
         }

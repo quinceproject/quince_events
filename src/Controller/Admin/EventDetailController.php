@@ -73,7 +73,7 @@ class EventDetailController extends EventsController
             $this->addFlash('success', $this->trans('The receiving flow accepted the event.', self::DOMAIN));
         } else {
             $this->addFlash('error', $this->trans(
-                'The event was not accepted. It stays in the queue — the reason is below.',
+                'The event was not accepted. It stays in the queue, the reason is below.',
                 self::DOMAIN
             ));
         }
