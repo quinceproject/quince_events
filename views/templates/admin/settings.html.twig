@@ -1,0 +1,85 @@
+{% extends '@Modules/quince_events/views/templates/admin/layout.html.twig' %}
+{% import '@Modules/quince_events/views/templates/admin/_macros/icons.html.twig' as icons %}
+
+{% trans_default_domain 'Modules.Quinceevents.Admin' %}
+
+{# Alpine.js napędza x-model (przełącznik „Wysyłaj zdarzenia") na tym
+   ekranie — layout modułu go nie ładuje, bo żaden inny ekran go nie
+   potrzebuje. Kopia z quince_engine, tak jak tokeny CSS w layout.html.twig. #}
+{% block javascripts %}
+    {{ parent() }}
+    <script src="{{ asset('../modules/quince_engine/views/js/vendor/alpine.min.js') ~ qcVer }}" defer></script>
+{% endblock %}
+
+{% block quince_actions %}
+    <button type="submit" form="quince-events-settings" class="qc-btn qc-btn-primary">
+        {{ icons.icon('check', 14) }} {{ 'Save changes'|trans }}
+    </button>
+{% endblock %}
+
+{% block quince_body %}
+
+{# Osobne formularze dla działań, które nie zapisują ustawień. #}
+<form id="quince-events-secret" method="post" action="{{ path('quince_events_settings_secret') }}" hidden>
+    <input type="hidden" name="_csrf_token" value="{{ csrf_token('quince_events_settings_secret') }}">
+</form>
+<form id="quince-events-test" method="post" action="{{ path('quince_events_settings_test') }}" hidden>
+    <input type="hidden" name="_csrf_token" value="{{ csrf_token('quince_events_settings_test') }}">
+</form>
+
+<form id="quince-events-settings" method="post" action="{{ path('quince_events_settings_save') }}" class="qc-stack">
+    <input type="hidden" name="_csrf_token" value="{{ csrf_token('quince_events_settings_save') }}">
+
+    <div class="qc-card">
+        <div class="qc-card-head">
+            <div>
+                <div class="qc-card-title">{{ 'Where the shop sends what happens'|trans }}</div>
+                <div class="qc-card-desc">{{ 'Every event goes to this address as soon as it happens. On the other side you can put a flow in n8n or Windmill.'|trans }}</div>
+            </div>
+        </div>
+        <div class="qc-card-body qc-stack">
+            <div class="qc-field" x-data="{ enabled: {{ enabled ? 'true' : 'false' }} }">
+                <label class="qc-toggle">
+                    <input type="checkbox" x-model="enabled">
+                    <span class="qc-toggle-track"></span>
+                    <span class="qc-toggle-text">{{ 'Send events'|trans }}</span>
+                </label>
+                <input type="hidden" name="ENABLED" :value="enabled ? 1 : 0">
+            </div>
+
+            <div class="qc-field" style="max-inline-size:480px">
+                <label class="qc-label" for="q-events-url">{{ 'Address'|trans }}</label>
+                <input type="url" class="qc-field-base qc-focusable" id="q-events-url" name="URL"
+                       value="{{ url }}" spellcheck="false" autocomplete="off"
+                       placeholder="https://n8n.twojadomena.pl/webhook/quince">
+                <div class="qc-hint">{{ 'The webhook address given to you by n8n, Windmill or whatever waits on the other side.'|trans }}</div>
+            </div>
+
+            <div class="qc-field" style="max-inline-size:620px">
+                <label class="qc-label" for="q-events-secret">{{ 'Shared secret'|trans }}</label>
+                <div style="display:flex; gap:12px; align-items:center">
+                    <input type="password" class="qc-field-base qc-focusable" id="q-events-secret" style="flex:1"
+                           value="{{ hasSecret ? '••••••••••••••••••••••••' : '' }}"
+                           placeholder="{{ hasSecret ? '' : 'Not set yet'|trans }}" readonly>
+                    <button type="submit" form="quince-events-secret" class="qc-btn qc-btn-outline" style="flex:none">
+                        {{ icons.icon('refresh', 14) }} {{ 'Generate a new secret'|trans }}
+                    </button>
+                </div>
+                <div class="qc-hint">{{ 'The shop signs every message with it and the receiving side checks the signature.'|trans }}</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="qc-card">
+        <div class="qc-card-head">
+            <div>
+                <div class="qc-card-title">{{ 'Check the connection'|trans }}</div>
+                <div class="qc-card-desc">{{ 'Sends one test message and tells you what came back.'|trans }}</div>
+            </div>
+        </div>
+        <div class="qc-card-body">
+            <button type="submit" form="quince-events-test" class="qc-btn qc-btn-outline">{{ 'Send a test event'|trans }}</button>
+        </div>
+    </div>
+</form>
+{% endblock %}

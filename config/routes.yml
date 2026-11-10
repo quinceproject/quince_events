@@ -1,0 +1,64 @@
+# Ekrany modułu — natywna zakładka pod „Quince project" (zob. installTabs()
+# w quince_events.php).
+#
+# `_legacy_controller` wskazuje WŁASNĄ zakładkę modułu (AdminQuinceEvents),
+# nie AdminQuinceProject: to ona niesie uprawnienia, które sprawdza PrestaShop
+# przy wejściu na trasę.
+
+quince_events:
+  path: quince/events
+  methods: [GET]
+  defaults:
+    _controller: Quince\Events\Controller\Admin\EventListController::indexAction
+    _legacy_controller: 'AdminQuinceEvents'
+    _legacy_link: 'AdminQuinceEvents'
+
+quince_events_event:
+  path: quince/events/{id}
+  methods: [GET]
+  requirements: { id: \d+ }
+  defaults:
+    _controller: Quince\Events\Controller\Admin\EventDetailController::indexAction
+    _legacy_controller: 'AdminQuinceEvents'
+    _legacy_link: 'AdminQuinceEvents'
+
+quince_events_event_retry:
+  path: quince/events/{id}/retry
+  methods: [POST]
+  requirements: { id: \d+ }
+  defaults:
+    _controller: Quince\Events\Controller\Admin\EventDetailController::retryAction
+    _legacy_controller: 'AdminQuinceEvents'
+    _legacy_link: 'AdminQuinceEvents:save'
+
+quince_events_settings:
+  path: quince/events/settings
+  methods: [GET]
+  defaults:
+    _controller: Quince\Events\Controller\Admin\SettingsController::indexAction
+    _legacy_controller: 'AdminQuinceEvents'
+    _legacy_link: 'AdminQuinceEvents'
+
+quince_events_settings_save:
+  path: quince/events/settings/save
+  methods: [POST]
+  defaults:
+    _controller: Quince\Events\Controller\Admin\SettingsController::saveAction
+    _legacy_controller: 'AdminQuinceEvents'
+    _legacy_link: 'AdminQuinceEvents:save'
+
+quince_events_settings_secret:
+  path: quince/events/settings/secret
+  methods: [POST]
+  defaults:
+    _controller: Quince\Events\Controller\Admin\SettingsController::secretAction
+    _legacy_controller: 'AdminQuinceEvents'
+    _legacy_link: 'AdminQuinceEvents:save'
+
+quince_events_settings_test:
+  path: quince/events/settings/test
+  methods: [POST]
+  defaults:
+    _controller: Quince\Events\Controller\Admin\SettingsController::testAction
+    _legacy_controller: 'AdminQuinceEvents'
+    _legacy_link: 'AdminQuinceEvents:save'

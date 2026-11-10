@@ -1,0 +1,23 @@
+{
+    "name": "quinceproject/events",
+    "description": "Quince Events: shop event log and outgoing delivery to external systems",
+    "type": "prestashop-module",
+    "license": "OSL-3.0",
+    "authors": [
+        {
+            "name": "Quince Project",
+            "email": "quinceproject@proton.me"
+        }
+    ],
+    "require": {
+        "php": ">=8.1"
+    },
+    "autoload": {
+        "psr-4": {
+            "Quince\\Events\\": "src/"
+        }
+    },
+    "config": {
+        "prepend-autoloader": false
+    }
+}

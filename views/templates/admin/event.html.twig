@@ -1,0 +1,66 @@
+{% extends '@Modules/quince_events/views/templates/admin/layout.html.twig' %}
+{% import '@Modules/quince_events/views/templates/admin/_macros/icons.html.twig' as icons %}
+
+{% trans_default_domain 'Modules.Quinceevents.Admin' %}
+
+{% set badge = { 'pending': 'qc-badge-warning', 'sent': 'qc-badge-success', 'failed': 'qc-badge-danger' } %}
+{% set label = { 'pending': 'Waiting'|trans, 'sent': 'Delivered'|trans, 'failed': 'Failed'|trans } %}
+
+{% block quince_intro %}
+    <a href="{{ path('quince_events') }}" style="display:inline-flex; align-items:center; gap:6px; font-size:13px; color:var(--fg-2); margin-bottom:10px">
+        {{ icons.icon('chevronLeft', 16) }} {{ 'Events'|trans }}
+    </a>
+    <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap; margin-bottom:20px">
+        <div style="font-size:22px; font-weight:800"><code>{{ event.type }}</code></div>
+        <span class="qc-badge {{ badge[event.status] }}">{{ label[event.status] }}</span>
+    </div>
+{% endblock %}
+
+{% block quince_body %}
+<div style="display:grid; grid-template-columns:1fr 320px; gap:20px; align-items:start">
+    <div class="qc-stack">
+        <div class="qc-card">
+            <div class="qc-card-head"><div class="qc-card-title">{{ 'Event payload'|trans }}</div></div>
+            <div class="qc-card-body">
+                <pre class="qc-mono">{{ payloadJson }}</pre>
+            </div>
+        </div>
+
+        {% if event.last_error %}
+            <div class="qc-card">
+                <div class="qc-card-head"><div class="qc-card-title">{{ 'Last error'|trans }}</div></div>
+                <div class="qc-card-body">
+                    <p class="qc-muted" style="margin:0">{{ event.last_error }}</p>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+
+    <div class="qc-stack">
+        <div class="qc-card">
+            <div class="qc-card-head"><div class="qc-card-title">{{ 'Information'|trans }}</div></div>
+            <div class="qc-card-body">
+                <dl style="display:grid; grid-template-columns:auto 1fr; gap:4px 12px; font-size:13px; margin:0">
+                    <dt style="color:var(--fg-3)">{{ 'Event ID'|trans }}</dt><dd style="margin:0; text-align:right"><code>{{ event.event_id }}</code></dd>
+                    <dt style="color:var(--fg-3)">{{ 'Submitted'|trans }}</dt><dd style="margin:0; text-align:right">{{ event.date_add }}</dd>
+                    <dt style="color:var(--fg-3)">{{ 'Attempts'|trans }}</dt><dd style="margin:0; text-align:right">{{ event.attempts }} / 6</dd>
+                    {% if event.status == 'pending' and event.next_try_at %}
+                        <dt style="color:var(--fg-3)">{{ 'Next attempt'|trans }}</dt><dd style="margin:0; text-align:right">{{ event.next_try_at|date('Y-m-d H:i') }}</dd>
+                    {% endif %}
+                </dl>
+            </div>
+        </div>
+
+        {% if event.status != 'sent' %}
+            <div class="qc-card">
+                <div class="qc-card-body qc-stack" style="gap:8px">
+                    <form method="post" action="{{ path('quince_events_event_retry', {id: event.id_quince_event}) }}">
+                        <input type="hidden" name="_csrf_token" value="{{ csrf_token('quince_events_event_retry') }}">
+                        <button type="submit" class="qc-btn qc-btn-primary" style="width:100%; justify-content:center">{{ 'Retry now'|trans }}</button>
+                    </form>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

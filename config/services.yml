@@ -1,0 +1,30 @@
+services:
+  _defaults:
+    public: true
+    autoconfigure: true
+    autowire: true
+    tags: ['controller.service_arguments']
+
+  Quince\Events\Controller\Admin\EventListController:
+    class: Quince\Events\Controller\Admin\EventListController
+    arguments:
+      - '@Quince\Events\Event\EventOutbox'
+
+  Quince\Events\Controller\Admin\EventDetailController:
+    class: Quince\Events\Controller\Admin\EventDetailController
+    arguments:
+      - '@Quince\Events\Event\EventOutbox'
+      - '@Quince\Events\Event\EventDispatcher'
+
+  Quince\Events\Controller\Admin\SettingsController:
+    class: Quince\Events\Controller\Admin\SettingsController
+    arguments:
+      - '@Quince\Events\Event\EventDispatcher'
+
+  Quince\Events\Event\EventOutbox:
+    class: Quince\Events\Event\EventOutbox
+
+  Quince\Events\Event\EventDispatcher:
+    class: Quince\Events\Event\EventDispatcher
+    arguments:
+      - '@Quince\Events\Event\EventOutbox'
