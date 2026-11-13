@@ -21,10 +21,9 @@ use Db;
  * stronie akurat nie odpowiada, zapytanie klienta znika bez śladu, a sklep nie
  * ma nawet czego ponowić.
  *
- * Ponowienia idą przy okazji kolejnych wysyłek, z rosnącym odstępem — bez
- * własnego zadania w harmonogramie, bo to kolejna rzecz do skonfigurowania
- * w sklepie, o której nikt nie pamięta. Operator może też ponowić jedno
- * zdarzenie od ręki, z listy albo ze szczegółu — bez czekania na odstęp.
+ * Ponowienia idą przy okazji kolejnych wysyłek, z rosnącym odstępem, bez
+ * własnego zadania w harmonogramie. Operator może też ponowić jedno
+ * zdarzenie od ręki, z listy albo ze szczegółu, bez czekania na odstęp.
  */
 final class EventOutbox
 {
@@ -39,7 +38,7 @@ final class EventOutbox
     /** Odstępy między próbami w sekundach: minuta, pięć, pół godziny, dwie, sześć. */
     private const BACKOFF = [60, 300, 1800, 7200, 21600];
 
-    /** Ile zdarzeń ponawiamy przy jednej okazji — żeby nie opóźniać żądania klienta. */
+    /** Ile zdarzeń ponawiamy przy jednej okazji, żeby nie opóźniać żądania klienta. */
     private const RETRY_BATCH = 3;
 
     public function installTable(): bool
@@ -94,7 +93,7 @@ final class EventOutbox
 
     /**
      * Nieudana próba: rosnący odstęp do następnej, a po wyczerpaniu prób
-     * zdarzenie zostaje w bazie ze stanem „failed". Nie kasujemy go — to jest
+     * zdarzenie zostaje w bazie ze stanem „failed". Nie kasujemy go: to jest
      * ślad po zapytaniu klienta i ktoś może chcieć je odczytać ręcznie.
      */
     public function markFailed(string $eventId, string $error): void

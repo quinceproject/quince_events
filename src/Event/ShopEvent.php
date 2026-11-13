@@ -16,15 +16,14 @@ namespace Quince\Events\Event;
  *
  * Jedna postać dla wszystkiego, co sklep ma do powiedzenia na zewnątrz:
  * zapytania z formularzy, zapisy do newslettera, cokolwiek dojdzie później.
- * System po drugiej stronie — n8n, Windmill, CRM — pisze wtedy jeden przepływ
+ * System po drugiej stronie (n8n, Windmill, CRM) pisze wtedy jeden przepływ
  * rozpoznający rodzaj zdarzenia, zamiast osobnego pod każdy moduł.
  *
- * Rozdzielamy trzy rzeczy, bo mieszanie ich kończy się schematem, którego nikt
- * nie umie odczytać:
+ * Koperta rozdziela trzy rzeczy:
  *
- *   - `type`    — co się stało („contact.enquiry"),
- *   - `context` — czego dotyczyło (produkt, kategoria, zamówienie),
- *   - `data`    — co wpisał człowiek, dokładnie tak, jak wpisał.
+ *   - `type`:    co się stało („contact.enquiry"),
+ *   - `context`: czego dotyczyło (produkt, kategoria, zamówienie),
+ *   - `data`:    co wpisał człowiek, dokładnie tak, jak wpisał.
  */
 final class ShopEvent
 {

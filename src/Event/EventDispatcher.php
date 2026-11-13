@@ -18,7 +18,7 @@ use Quince\Engine\Settings\ConfigStore;
 /**
  * Wysyłka zdarzeń sklepu na zewnątrz.
  *
- * Jeden adres, jeden podpis, jedna postać koperty — dla wszystkich modułów.
+ * Jeden adres, jeden podpis, jedna postać koperty dla wszystkich modułów.
  * Po drugiej stronie stoi przepływ w n8n albo Windmillu, który rozdziela ruch
  * po rodzaju zdarzenia i robi z nim, co sklep sobie ustalił: zakłada sprawę
  * w CRM-ie, pisze na czacie zespołu, dopisuje wiersz w arkuszu.
@@ -27,7 +27,7 @@ use Quince\Engine\Settings\ConfigStore;
  *
  * **Zapis przed wysyłką.** Zdarzenie ląduje w skrzynce nadawczej, zanim
  * ruszymy z żądaniem. Przepływ po drugiej stronie bywa wyłączony, przeciążony
- * albo w trakcie wdrożenia — a zapytanie klienta nie może wtedy zniknąć.
+ * albo w trakcie wdrożenia, a zapytanie klienta nie może wtedy zniknąć.
  *
  * **Podpis, nie hasło w adresie.** Do nagłówka idzie skrót treści policzony
  * wspólnym sekretem. Odbiorca liczy go u siebie i porównuje: dzięki temu wie,
@@ -79,8 +79,8 @@ final class EventDispatcher
         ConfigStore::set(self::ENABLED, empty($values['ENABLED']) ? '0' : '1');
         ConfigStore::set(self::URL, trim((string) ($values['URL'] ?? '')));
 
-        // Sekret, którego sprzedawca nie wpisał, zostaje ten, który był —
-        // pole pokazujemy puste, żeby nie wyświetlać go w panelu.
+        // Puste pole zostawia dotychczasowy sekret. Pole jest puste, bo
+        // panel nie wyświetla sekretu.
         $sekret = trim((string) ($values['SECRET'] ?? ''));
 
         if ($sekret !== '') {
@@ -107,15 +107,15 @@ final class EventDispatcher
     /**
      * Zgłoszenie zdarzenia.
      *
-     * Zapis do dziennika jest BEZWARUNKOWY — dzieje się zawsze, niezależnie
+     * Zapis do dziennika jest BEZWARUNKOWY: dzieje się zawsze, niezależnie
      * od tego, czy magistrala do zewnętrznego odbiorcy jest w ogóle włączona.
      * Dziennik ma własnych konsumentów wewnątrz sklepu (np. moduł powiadomień),
-     * którym nieskonfigurowany CEP czy n8n nic nie obchodzi — `isReady()`
+     * którym nieskonfigurowany CEP czy n8n nic nie obchodzi. `isReady()`
      * decyduje WYŁĄCZNIE o tym, czy w ogóle próbować wysyłki na zewnątrz.
      *
      * Zwraca `true`, gdy odbiorca potwierdził przyjęcie. `false` znaczy „nie
      * teraz" (magistrala wyłączona/nieskonfigurowana, albo odbiorca nie
-     * odpowiedział) — zdarzenie i tak zostaje w dzienniku i wróci przy
+     * odpowiedział). Zdarzenie i tak zostaje w dzienniku i wróci przy
      * kolejnej okazji, jeśli akurat jest do wysłania.
      */
     public function dispatch(ShopEvent $event): bool
@@ -131,14 +131,14 @@ final class EventDispatcher
 
         $wynik = $this->send($id, $event->type, $koperta);
 
-        // Przy okazji własnej wysyłki dobijamy to, co czeka — bez zadania
-        // w harmonogramie, o którym trzeba pamiętać przy każdym wdrożeniu.
+        // Przy okazji własnej wysyłki dobijamy to, co czeka. Dzięki temu
+        // ponowienia nie wymagają zadania w harmonogramie.
         $this->retryDue();
 
         return $wynik;
     }
 
-    /** Próbne zdarzenie z panelu — sprawdza adres, podpis i odpowiedź. */
+    /** Próbne zdarzenie z panelu: sprawdza adres, podpis i odpowiedź. */
     public function sendTest(): bool
     {
         return $this->dispatch(new ShopEvent(
@@ -165,8 +165,8 @@ final class EventDispatcher
     }
 
     /**
-     * Ponowienie jednego, wybranego zdarzenia od ręki — z listy albo ze
-     * szczegółu w panelu, bez czekania na odstęp wyliczony po poprzedniej
+     * Ponowienie jednego, wybranego zdarzenia od ręki (z listy albo ze
+     * szczegółu w panelu), bez czekania na odstęp wyliczony po poprzedniej
      * nieudanej próbie.
      */
     public function retryNow(string $eventId): bool

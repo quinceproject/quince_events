@@ -32,21 +32,17 @@ use Quince\Events\Event\EventDispatcher;
 use Quince\Events\Event\EventOutbox;
 
 /**
- * Quince Events — dziennik i wysyłka zdarzeń sklepu.
+ * Quince Events: dziennik i wysyłka zdarzeń sklepu.
  *
  * Każdy inny moduł Quince (i każdy przyszły) zgłasza tu swoje zdarzenia
  * przez `Quince\Events\EventDispatcher::dispatch()`. Moduł robi dwie rzeczy
  * z każdym z nich: zapisuje je BEZWARUNKOWO w dzienniku (do przeglądania,
- * do przyszłych powiadomień sklepu — nieważne, czy jest odbiorca), i próbuje
- * wysłać je na zewnątrz, jeśli magistrala jest skonfigurowana (CEP, n8n,
- * Windmill, cokolwiek).
+ * do przyszłych powiadomień sklepu, niezależnie od tego, czy jest odbiorca),
+ * i próbuje wysłać je na zewnątrz, jeśli magistrala jest skonfigurowana
+ * (CEP, n8n, Windmill, cokolwiek).
  *
- * Stoi obok Quince, nie w nim — osobny moduł, tak jak `quince_withdrawal`
- * czy `quince_gpsr`: to zarządzanie danymi (dziennik, filtrowanie,
- * ponawianie), nie ustawienie wyglądu, więc nie pasuje do wnętrza panelu
- * silnika. Wcześniej żył jako pozycja „System" w sidebarze Quince Engine —
- * stamtąd usunięty przy porcie do tego modułu (ta sama tabela `quince_event`,
- * ten sam adres i sekret).
+ * Tabela `quince_event`, adres i sekret są te same, których używała dawna
+ * pozycja „System" w panelu Quince Engine.
  */
 class Quince_Events extends Module
 {

@@ -4,8 +4,8 @@
 {% trans_default_domain 'Modules.Quinceevents.Admin' %}
 
 {# Alpine.js napędza x-model (przełącznik „Wysyłaj zdarzenia") na tym
-   ekranie — layout modułu go nie ładuje, bo żaden inny ekran go nie
-   potrzebuje. Kopia z quince_engine, tak jak tokeny CSS w layout.html.twig. #}
+   ekranie. Layout modułu go nie ładuje, bo żaden inny ekran go nie
+   potrzebuje. Plik z quince_engine, tak jak tokeny CSS w layout.html.twig. #}
 {% block javascripts %}
     {{ parent() }}
     <script src="{{ asset('../modules/quince_engine/views/js/vendor/alpine.min.js') ~ qcVer }}" defer></script>

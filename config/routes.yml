@@ -1,4 +1,4 @@
-# Ekrany modułu — natywna zakładka pod „Quince project" (zob. installTabs()
+# Ekrany modułu: natywna zakładka pod „Quince project" (zob. installTabs()
 # w quince_events.php).
 #
 # `_legacy_controller` wskazuje WŁASNĄ zakładkę modułu (AdminQuinceEvents),

@@ -4,12 +4,11 @@
   Rozszerza natywny layout panelu PrestaShopa, nie layout silnika Quince:
   ten moduł jest zakładką pod „Quince project" (zob. komentarz w
   `quince_events.php` przy installTabs()), nie pozycją wewnątrz panelu
-  Quince Engine — `{% extends %}` z cudzego katalogu dawałoby tu obcy sidebar.
+  Quince Engine. `{% extends %}` z cudzego katalogu dawałoby tu obcy sidebar.
 
   Arkusze qc-* brane są wprost z silnika (asset), nie kopiowane: moduł zakłada
-  obecność `quince_engine` w tym sklepie, więc powielanie tokenów i powłoki
-  tylko wprowadziłoby ryzyko rozjechania dwóch kopii. `panel.css` dokłada się
-  obok tokenów — to on niesie `.qc-stack`, reset `.qc-root` i neutralizację
+  obecność `quince_engine` w tym sklepie. `panel.css` dokłada się obok
+  tokenów: to on niesie `.qc-stack`, reset `.qc-root` i neutralizację
   stylów back-office'u PrestaShopa, bez czego sekcje stykają się bez odstępu.
 
   Tytuł strony i okruszek rysuje PrestaShop z drzewa zakładek, więc ich tu nie

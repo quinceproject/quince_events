@@ -72,7 +72,7 @@ class SettingsController extends EventsController
         return $this->redirectToRoute('quince_events_settings');
     }
 
-    /** Próbne zdarzenie — sprawdza adres, podpis i odpowiedź odbiorcy. */
+    /** Próbne zdarzenie: sprawdza adres, podpis i odpowiedź odbiorcy. */
     public function testAction(Request $request): RedirectResponse
     {
         if (!$this->isCsrfTokenValid('quince_events_settings_test', $request->request->get('_csrf_token'))) {
