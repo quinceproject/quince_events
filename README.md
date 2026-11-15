@@ -116,13 +116,18 @@ Each event is a `POST` request with a JSON body:
 }
 ```
 
-and three headers:
+and four headers:
 
 | Header | Content |
 |--------|---------|
-| `X-Quince-Signature` | `sha256=` followed by the HMAC SHA-256 of the raw body, keyed with the shared secret |
+| `X-Quince-Timestamp` | the time of this sending attempt, in Unix seconds |
+| `X-Quince-Signature` | `sha256=` followed by the HMAC SHA-256 of `timestamp + "." + raw body`, keyed with the shared secret |
 | `X-Quince-Event` | the event type, for routing without reading the body |
 | `X-Quince-Event-Id` | the event id, the same on every retry, for deduplication |
+
+To check a request, compute the HMAC from the raw body byte for byte (do not re-encode
+the JSON), compare it with the header, and reject a timestamp more than 300 seconds
+off your clock. Each retry is signed again with its own timestamp.
 
 Any `2xx` answer counts as delivered. Anything else, or no answer within 2 seconds,
 counts as a failed attempt.

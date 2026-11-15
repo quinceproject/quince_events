@@ -29,9 +29,10 @@ use Quince\Engine\Settings\ConfigStore;
  * ruszymy z żądaniem. Przepływ po drugiej stronie bywa wyłączony, przeciążony
  * albo w trakcie wdrożenia, a zapytanie klienta nie może wtedy zniknąć.
  *
- * **Podpis, nie hasło w adresie.** Do nagłówka idzie skrót treści policzony
- * wspólnym sekretem. Odbiorca liczy go u siebie i porównuje: dzięki temu wie,
- * że koperta wyszła z tego sklepu i że nikt jej po drodze nie zmienił. Adres
+ * **Podpis, nie hasło w adresie.** Do nagłówka idzie skrót czasu wysłania
+ * i treści policzony wspólnym sekretem. Odbiorca liczy go u siebie i porównuje:
+ * dzięki temu wie, że koperta wyszła z tego sklepu, że nikt jej po drodze nie
+ * zmienił i że nie jest starą kopią odtworzoną później. Adres
  * z tajnym parametrem zostawiłby ten sekret w dziennikach każdego serwera
  * pośredniczącego.
  *
@@ -47,6 +48,7 @@ final class EventDispatcher
 
     /** Nagłówki, którymi opisujemy kopertę odbiorcy. */
     public const HEADER_SIGNATURE = 'X-Quince-Signature';
+    public const HEADER_TIMESTAMP = 'X-Quince-Timestamp';
     public const HEADER_EVENT = 'X-Quince-Event';
     public const HEADER_ID = 'X-Quince-Event-Id';
 
@@ -225,7 +227,11 @@ final class EventDispatcher
     private function send(string $id, string $type, array $koperta): bool
     {
         $tresc = (string) json_encode($koperta, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
-        $podpis = hash_hmac('sha256', $tresc, $this->secret());
+        // Czas wysłania w podpisie: ponowienie niesie tę samą treść, więc bez niego
+        // przechwyconą kopertę dałoby się odtworzyć u odbiorcy w dowolnej chwili.
+        // Ten sam schemat co synchronizacja Quince CMP.
+        $znacznik = time();
+        $podpis = hash_hmac('sha256', $znacznik . '.' . $tresc, $this->secret());
 
         $adres = $this->url();
         $cel = self::sprawdzCel($adres);
@@ -259,6 +265,7 @@ final class EventDispatcher
             CURLOPT_RESOLVE => $cel['resolve'],
             CURLOPT_HTTPHEADER => [
                 'Content-Type: application/json',
+                self::HEADER_TIMESTAMP . ': ' . $znacznik,
                 self::HEADER_SIGNATURE . ': sha256=' . $podpis,
                 self::HEADER_EVENT . ': ' . $type,
                 self::HEADER_ID . ': ' . $id,

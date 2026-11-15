@@ -4,6 +4,17 @@ All notable changes to this module are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the versioning follows
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.4] - 2026-11-15
+
+### Security
+
+- **The signature covers the time of sending.** Each request carries
+  `X-Quince-Timestamp`, and `X-Quince-Signature` is now the HMAC of
+  `timestamp + "." + raw body`, the same scheme as the Quince CMP sync. The receiver can
+  reject a request older than a few minutes, so a captured request cannot be played
+  back later. **Receivers that check the signature need to be updated**: see "What the
+  receiver gets" in the README.
+
 ## [0.1.3] - 2026-11-15
 
 ### Security
