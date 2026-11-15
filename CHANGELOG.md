@@ -4,6 +4,16 @@ All notable changes to this module are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the versioning follows
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.2] - 2026-11-15
+
+### Security
+
+- Every back-office screen of the module checks the employee's permissions on the
+  **Events** tab (`AdminQuinceEvents`). Before, any logged-in employee, whatever their
+  profile, could change the address events are sent to, and with it where customers'
+  personal data from Quince forms goes. Grant the tab to a profile under
+  **Advanced Parameters → Team → Permissions**; SuperAdmin needs nothing.
+
 ## [0.1.1] - 2026-11-10
 
 ### Added

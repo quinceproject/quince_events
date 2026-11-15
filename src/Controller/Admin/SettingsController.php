@@ -11,6 +11,7 @@ declare(strict_types=1);
 
 namespace Quince\Events\Controller\Admin;
 
+use PrestaShopBundle\Security\Attribute\AdminSecurity;
 use Quince\Events\Event\EventDispatcher;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -25,6 +26,7 @@ class SettingsController extends EventsController
     {
     }
 
+    #[AdminSecurity("is_granted('read', request.get('_legacy_controller'))", message: 'You do not have permission to view this.')]
     public function indexAction(): Response
     {
         return $this->renderPanel(
@@ -38,6 +40,7 @@ class SettingsController extends EventsController
         );
     }
 
+    #[AdminSecurity("is_granted('update', request.get('_legacy_controller'))", message: 'You do not have permission to change this.')]
     public function saveAction(Request $request): RedirectResponse
     {
         if (!$this->isCsrfTokenValid('quince_events_settings_save', $request->request->get('_csrf_token'))) {
@@ -53,6 +56,7 @@ class SettingsController extends EventsController
     }
 
     /** Nowy sekret: sprzedawca wkleja go po drugiej stronie i tam porównuje podpisy. */
+    #[AdminSecurity("is_granted('update', request.get('_legacy_controller'))", message: 'You do not have permission to change this.')]
     public function secretAction(Request $request): RedirectResponse
     {
         if (!$this->isCsrfTokenValid('quince_events_settings_secret', $request->request->get('_csrf_token'))) {
@@ -73,6 +77,7 @@ class SettingsController extends EventsController
     }
 
     /** Próbne zdarzenie: sprawdza adres, podpis i odpowiedź odbiorcy. */
+    #[AdminSecurity("is_granted('update', request.get('_legacy_controller'))", message: 'You do not have permission to change this.')]
     public function testAction(Request $request): RedirectResponse
     {
         if (!$this->isCsrfTokenValid('quince_events_settings_test', $request->request->get('_csrf_token'))) {

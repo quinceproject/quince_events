@@ -11,6 +11,7 @@ declare(strict_types=1);
 
 namespace Quince\Events\Controller\Admin;
 
+use PrestaShopBundle\Security\Attribute\AdminSecurity;
 use Quince\Events\Event\EventDispatcher;
 use Quince\Events\Event\EventOutbox;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -28,6 +29,7 @@ class EventDetailController extends EventsController
     ) {
     }
 
+    #[AdminSecurity("is_granted('read', request.get('_legacy_controller'))", message: 'You do not have permission to view this.')]
     public function indexAction(int $id): Response
     {
         $event = $this->outbox->get($id);
@@ -53,6 +55,7 @@ class EventDetailController extends EventsController
         );
     }
 
+    #[AdminSecurity("is_granted('update', request.get('_legacy_controller'))", message: 'You do not have permission to change this.')]
     public function retryAction(int $id, Request $request): RedirectResponse
     {
         if (!$this->isCsrfTokenValid('quince_events_event_retry', $request->request->get('_csrf_token'))) {

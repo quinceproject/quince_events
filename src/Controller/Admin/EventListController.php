@@ -11,6 +11,7 @@ declare(strict_types=1);
 
 namespace Quince\Events\Controller\Admin;
 
+use PrestaShopBundle\Security\Attribute\AdminSecurity;
 use Quince\Events\Event\EventOutbox;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -24,6 +25,7 @@ class EventListController extends EventsController
     {
     }
 
+    #[AdminSecurity("is_granted('read', request.get('_legacy_controller'))", message: 'You do not have permission to view this.')]
     public function indexAction(Request $request): Response
     {
         $filters = [
