@@ -11,6 +11,7 @@ declare(strict_types=1);
 
 namespace Quince\Events\Event;
 
+use Configuration;
 use Db;
 
 /**
@@ -40,6 +41,13 @@ final class EventOutbox
 
     /** Ile zdarzeń ponawiamy przy jednej okazji, żeby nie opóźniać żądania klienta. */
     private const RETRY_BATCH = 3;
+
+    /** Kiedy ostatnio sprzątaliśmy stare zdarzenia (znacznik czasu). */
+    public const LAST_PURGE = 'QUINCE_EVENTS_LAST_PURGE';
+
+    /** Po ilu dniach znikają zdarzenia wysłane i te, których nie udało się dostarczyć. */
+    private const KEEP_SENT_DAYS = 30;
+    private const KEEP_FAILED_DAYS = 90;
 
     public function installTable(): bool
     {
@@ -93,7 +101,7 @@ final class EventOutbox
 
     /**
      * Nieudana próba: rosnący odstęp do następnej, a po wyczerpaniu prób
-     * zdarzenie zostaje w bazie ze stanem „failed". Nie kasujemy go: to jest
+     * zdarzenie zostaje w bazie ze stanem „failed" przez 90 dni: to jest
      * ślad po zapytaniu klienta i ktoś może chcieć je odczytać ręcznie.
      */
     public function markFailed(string $eventId, string $error): void
@@ -112,6 +120,34 @@ final class EventOutbox
             'next_try_at' => time() + $odstep,
             'date_upd' => date('Y-m-d H:i:s'),
         ], 'event_id = "' . pSQL($eventId) . '"');
+    }
+
+    /**
+     * Usunięcie starych zdarzeń, najwyżej raz na dobę.
+     *
+     * Koperta niesie dane osobowe z formularzy, więc nie może leżeć w bazie
+     * bez terminu. Nieudane trzymamy dłużej, żeby ktoś zdążył je odczytać
+     * ręcznie. Oczekujące zostają: wciąż mogą dojść do odbiorcy.
+     */
+    public function purgeExpired(): void
+    {
+        if ((int) Configuration::getGlobalValue(self::LAST_PURGE) > time() - 86400) {
+            return;
+        }
+
+        // Znacznik przed kasowaniem, żeby równoległe żądania nie kasowały naraz.
+        Configuration::updateGlobalValue(self::LAST_PURGE, (string) time());
+
+        Db::getInstance()->delete(
+            self::TABLE,
+            'status = "sent" AND date_upd < "' . date('Y-m-d H:i:s', time() - self::KEEP_SENT_DAYS * 86400) . '"'
+        );
+        // Oczekujące dłużej niż zawiodłe: przy wyłączonej wysyłce zdarzenie
+        // nigdy nie wychodzi i bez tego zostawałoby w dzienniku na zawsze.
+        Db::getInstance()->delete(
+            self::TABLE,
+            'status IN ("failed", "pending") AND date_upd < "' . date('Y-m-d H:i:s', time() - self::KEEP_FAILED_DAYS * 86400) . '"'
+        );
     }
 
     /**

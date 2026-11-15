@@ -49,7 +49,15 @@ class SettingsController extends EventsController
             return $this->redirectToRoute('quince_events_settings');
         }
 
-        $this->dispatcher->save($request->request->all());
+        if (!$this->dispatcher->save($request->request->all())) {
+            $this->addFlash('error', $this->trans(
+                'The address must start with https:// and contain a host name. Nothing was saved.',
+                self::DOMAIN
+            ));
+
+            return $this->redirectToRoute('quince_events_settings');
+        }
+
         $this->addFlash('success', $this->trans('Settings saved.', self::DOMAIN));
 
         return $this->redirectToRoute('quince_events_settings');

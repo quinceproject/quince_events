@@ -39,7 +39,8 @@ use Quince\Events\Event\EventOutbox;
  * z każdym z nich: zapisuje je BEZWARUNKOWO w dzienniku (do przeglądania,
  * do przyszłych powiadomień sklepu, niezależnie od tego, czy jest odbiorca),
  * i próbuje wysłać je na zewnątrz, jeśli magistrala jest skonfigurowana
- * (CEP, n8n, Windmill, cokolwiek).
+ * (CEP, n8n, Windmill, cokolwiek). Dziennik ma termin przechowywania,
+ * bo koperty niosą dane osobowe z formularzy.
  *
  * Tabela `quince_event`, adres i sekret są te same, których używała dawna
  * pozycja „System" w panelu Quince Engine.
@@ -52,7 +53,7 @@ class Quince_Events extends Module
     {
         $this->name = 'quince_events';
         $this->tab = 'administration';
-        $this->version = '0.1.2';
+        $this->version = '0.1.3';
         $this->author = 'Quince Project';
         $this->need_instance = 0;
         $this->ps_versions_compliancy = ['min' => '9.0.0', 'max' => '9.99.99'];

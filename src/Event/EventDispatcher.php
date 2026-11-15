@@ -73,11 +73,23 @@ final class EventDispatcher
         return trim((string) Configuration::get(self::SECRET));
     }
 
-    /** @param array<string,mixed> $values */
-    public function save(array $values): void
+    /**
+     * Zwraca `false`, gdy adres odbiorcy nie przeszedł sprawdzenia. Wtedy nic
+     * nie zapisujemy, żeby nie zostawić włączonej wysyłki z dawnym adresem.
+     *
+     * @param array<string,mixed> $values
+     */
+    public function save(array $values): bool
     {
+        $adres = trim((string) ($values['URL'] ?? ''));
+
+        // Puste pole wolno zapisać: tak sprzedawca odłącza odbiorcę.
+        if ($adres !== '' && !self::poprawnyAdres($adres)) {
+            return false;
+        }
+
         ConfigStore::set(self::ENABLED, empty($values['ENABLED']) ? '0' : '1');
-        ConfigStore::set(self::URL, trim((string) ($values['URL'] ?? '')));
+        ConfigStore::set(self::URL, $adres);
 
         // Puste pole zostawia dotychczasowy sekret. Pole jest puste, bo
         // panel nie wyświetla sekretu.
@@ -86,6 +98,22 @@ final class EventDispatcher
         if ($sekret !== '') {
             ConfigStore::set(self::SECRET, $sekret);
         }
+
+        return true;
+    }
+
+    /**
+     * Tylko `https://` z nazwą hosta. Inne protokoły (`file://`, `gopher://`)
+     * zamieniłyby pole w panelu w narzędzie do odpytywania serwera sklepu,
+     * a zwykły `http://` wysyłałby dane z formularzy otwartym tekstem.
+     */
+    public static function poprawnyAdres(string $adres): bool
+    {
+        if (filter_var($adres, FILTER_VALIDATE_URL) === false || !str_starts_with(strtolower($adres), 'https://')) {
+            return false;
+        }
+
+        return (string) parse_url($adres, PHP_URL_HOST) !== '';
     }
 
     /** Nowy sekret do wklejenia po drugiej stronie. */
@@ -99,7 +127,7 @@ final class EventDispatcher
 
     public function removeSettings(): void
     {
-        foreach ([self::ENABLED, self::URL, self::SECRET] as $klucz) {
+        foreach ([self::ENABLED, self::URL, self::SECRET, EventOutbox::LAST_PURGE] as $klucz) {
             Configuration::deleteByName($klucz);
         }
     }
@@ -112,11 +140,12 @@ final class EventDispatcher
      * Dziennik ma własnych konsumentów wewnątrz sklepu (np. moduł powiadomień),
      * którym nieskonfigurowany CEP czy n8n nic nie obchodzi. `isReady()`
      * decyduje WYŁĄCZNIE o tym, czy w ogóle próbować wysyłki na zewnątrz.
+     * Koperty niosą dane osobowe, więc dziennik ma termin przechowywania
+     * (`EventOutbox::purgeExpired()`).
      *
      * Zwraca `true`, gdy odbiorca potwierdził przyjęcie. `false` znaczy „nie
      * teraz" (magistrala wyłączona/nieskonfigurowana, albo odbiorca nie
-     * odpowiedział). Zdarzenie i tak zostaje w dzienniku i wróci przy
-     * kolejnej okazji, jeśli akurat jest do wysłania.
+     * odpowiedział).
      */
     public function dispatch(ShopEvent $event): bool
     {
@@ -126,6 +155,8 @@ final class EventDispatcher
         $this->outbox->store($id, $event->type, $koperta);
 
         if (!$this->isReady()) {
+            $this->outbox->purgeExpired();
+
             return false;
         }
 
@@ -162,6 +193,8 @@ final class EventDispatcher
 
             $this->send($zdarzenie['event_id'], (string) ($koperta['type'] ?? ''), $koperta);
         }
+
+        $this->outbox->purgeExpired();
     }
 
     /**
@@ -194,7 +227,16 @@ final class EventDispatcher
         $tresc = (string) json_encode($koperta, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
         $podpis = hash_hmac('sha256', $tresc, $this->secret());
 
-        $ch = curl_init($this->url());
+        $adres = $this->url();
+        $cel = self::sprawdzCel($adres);
+
+        if ($cel['error'] !== '') {
+            $this->outbox->markFailed($id, $cel['error']);
+
+            return false;
+        }
+
+        $ch = curl_init($adres);
 
         if ($ch === false) {
             $this->outbox->markFailed($id, 'Could not open the connection.');
@@ -208,6 +250,13 @@ final class EventDispatcher
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_TIMEOUT => self::TIMEOUT,
             CURLOPT_CONNECTTIMEOUT => self::TIMEOUT,
+            CURLOPT_PROTOCOLS => CURLPROTO_HTTP | CURLPROTO_HTTPS,
+            CURLOPT_REDIR_PROTOCOLS => CURLPROTO_HTTP | CURLPROTO_HTTPS,
+            // Przekierowanie ominęłoby sprawdzenie adresu, więc za nim nie idziemy.
+            CURLOPT_FOLLOWLOCATION => false,
+            // Połączenie przypięte do sprawdzonego adresu. Bez tego DNS mógłby
+            // między sprawdzeniem a połączeniem odpowiedzieć czym innym.
+            CURLOPT_RESOLVE => $cel['resolve'],
             CURLOPT_HTTPHEADER => [
                 'Content-Type: application/json',
                 self::HEADER_SIGNATURE . ': sha256=' . $podpis,
@@ -230,6 +279,77 @@ final class EventDispatcher
         $this->outbox->markSent($id);
 
         return true;
+    }
+
+    /**
+     * Sprawdzenie adresu, pod który połączenie faktycznie pójdzie.
+     *
+     * Sam napis nie wystarczy: domena może wskazywać na `127.0.0.1`, `10.0.0.5`
+     * albo `169.254.169.254` (usługa metadanych u dostawców chmurowych). Każdy
+     * adres, na który rozwiązuje się nazwa, musi leżeć poza sieciami
+     * prywatnymi i zastrzeżonymi. Ten sam sposób co w quince_cmp.
+     *
+     * @return array{error:string,resolve:array<int,string>}
+     */
+    private static function sprawdzCel(string $adres): array
+    {
+        $zle = static fn (string $powod): array => ['error' => $powod, 'resolve' => []];
+
+        // Adres zapisany przed wprowadzeniem sprawdzenia przy zapisie.
+        if (!self::poprawnyAdres($adres)) {
+            return $zle('The address must be an absolute https:// address.');
+        }
+
+        $czesci = parse_url($adres);
+        $host = (string) ($czesci['host'] ?? '');
+        $port = (int) ($czesci['port'] ?? 443);
+        $goly = trim($host, '[]');
+        $literal = filter_var($goly, FILTER_VALIDATE_IP) !== false;
+        $adresy = $literal ? [$goly] : self::rozwiaz($host);
+
+        if ($adresy === []) {
+            return $zle('The host name does not resolve to any address.');
+        }
+
+        foreach ($adresy as $ip) {
+            if (filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE) === false) {
+                return $zle('The address resolves to ' . $ip . ', which is inside this server\'s own network.');
+            }
+        }
+
+        // Adres IP wpisany wprost nie przechodzi przez DNS, nie ma czego przypinać.
+        if ($literal) {
+            return ['error' => '', 'resolve' => []];
+        }
+
+        $ip = $adresy[0];
+
+        return [
+            'error' => '',
+            'resolve' => [$host . ':' . $port . ':' . (str_contains($ip, ':') ? '[' . $ip . ']' : $ip)],
+        ];
+    }
+
+    /**
+     * Wszystkie adresy IPv4 i IPv6, na które rozwiązuje się nazwa.
+     *
+     * @return array<int,string>
+     */
+    private static function rozwiaz(string $host): array
+    {
+        $out = [];
+
+        foreach (@gethostbynamel($host) ?: [] as $ip) {
+            $out[] = (string) $ip;
+        }
+
+        foreach (@dns_get_record($host, DNS_AAAA) ?: [] as $wpis) {
+            if (is_array($wpis) && isset($wpis['ipv6'])) {
+                $out[] = (string) $wpis['ipv6'];
+            }
+        }
+
+        return array_values(array_unique($out));
     }
 
     /**

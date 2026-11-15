@@ -34,6 +34,10 @@
         <source>Settings saved.</source>
         <target>Ustawienia zapisane.</target>
       </trans-unit>
+      <trans-unit id="quince.events.flash.bad_url">
+        <source>The address must start with https:// and contain a host name. Nothing was saved.</source>
+        <target>Adres musi zaczynać się od https:// i zawierać nazwę hosta. Nic nie zostało zapisane.</target>
+      </trans-unit>
       <trans-unit id="quince.events.flash.new_secret">
         <source>New secret: %secret%. Copy it into the receiving flow now, it will not be shown again.</source>
         <target>Nowy sekret: %secret%. Skopiuj go teraz do przepływu po drugiej stronie, nie pokaże się ponownie.</target>

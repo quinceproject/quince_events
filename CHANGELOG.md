@@ -4,6 +4,18 @@ All notable changes to this module are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the versioning follows
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.3] - 2026-11-15
+
+### Security
+
+- **The receiver address must be `https://`.** Other addresses are refused when you
+  save. Before sending, the module checks that the address does not lead to the
+  server itself or to an internal network, and connects only to the address it
+  checked. Before, the field accepted any protocol (`file://`, `gopher://`) and could
+  be used to probe the shop's server.
+- **The event log has a retention period**: sent events are deleted after 30 days,
+  failed and never-sent ones after 90. Events carry personal data from forms.
+
 ## [0.1.2] - 2026-11-15
 
 ### Security
