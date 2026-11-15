@@ -11,6 +11,10 @@ declare(strict_types=1);
 
 namespace Quince\Events\Event;
 
+if (!defined('_PS_VERSION_')) {
+    exit;
+}
+
 use Configuration;
 use Db;
 

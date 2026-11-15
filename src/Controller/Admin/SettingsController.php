@@ -11,6 +11,10 @@ declare(strict_types=1);
 
 namespace Quince\Events\Controller\Admin;
 
+if (!defined('_PS_VERSION_')) {
+    exit;
+}
+
 use PrestaShopBundle\Security\Attribute\AdminSecurity;
 use Quince\Events\Event\EventDispatcher;
 use Symfony\Component\HttpFoundation\RedirectResponse;
