@@ -58,6 +58,9 @@
                 </div>
             {% endif %}
         {% endblock %}
+
+        {# Pasek wsparcia z silnika; ze starszym silnikiem bez tego pliku nic. #}
+        {% include '@Modules/quince_engine/views/templates/admin/_support-strip.html.twig' ignore missing %}
     </div>
 </div>
 {% endblock %}
